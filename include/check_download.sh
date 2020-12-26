@@ -53,7 +53,7 @@ checkDownload() {
       [[ "${db_option}" =~ ^[2,5,6,7]$|^10$ ]] && boost_ver=${boost_oldver}
       [[ "${db_option}" =~ ^9$ ]] && boost_ver=${boost_percona_ver}
       echo "Download boost..."
-      DOWN_ADDR_BOOST=http://downloads.sourceforge.net/project/boost/boost/${boost_ver}
+      DOWN_ADDR_BOOST=https//downloads.sourceforge.net/project/boost/boost/${boost_ver}
       boostVersion2=$(echo ${boost_ver} | awk -F. '{print $1"_"$2"_"$3}')
       src_url=${DOWN_ADDR_BOOST}/boost_${boostVersion2}.tar.gz && Download_src
     fi
@@ -62,7 +62,7 @@ checkDownload() {
       2)
         # MySQL 5.7
         DOWN_ADDR_MYSQL=https://cdn.mysql.com/Downloads/MySQL-5.7
-        DOWN_ADDR_MYSQL_BK=http://mysql.he.net/Downloads/MySQL-5.7
+        DOWN_ADDR_MYSQL_BK=https://mysql.he.net/Downloads/MySQL-5.7
 
 
         if [ "${dbinstallmethod}" == '1' ]; then
@@ -93,8 +93,8 @@ checkDownload() {
         ;;
       3)
         # MySQL 5.6
-        DOWN_ADDR_MYSQL=http://cdn.mysql.com/Downloads/MySQL-5.6
-        DOWN_ADDR_MYSQL_BK=http://mysql.he.net/Downloads/MySQL-5.6
+        DOWN_ADDR_MYSQL=https://cdn.mysql.com/Downloads/MySQL-5.6
+        DOWN_ADDR_MYSQL_BK=https://mysql.he.net/Downloads/MySQL-5.6
 
 
         if [ "${dbinstallmethod}" == '1' ]; then
@@ -170,21 +170,18 @@ checkDownload() {
       src_url=https://secure.php.net/distributions/php-${php72_ver}.tar.gz && Download_src
       #src_url=https://github.com/P-H-C/phc-winner-argon2/archive/${argon2_ver}.tar.gz && Download_src
       tar xzf argon2-${argon2_ver}.tar.gz
-      mv phc-winner-argon2-20190702 argon2-${argon2_ver}
       src_url=https://github.com/jedisct1/libsodium/releases/download/${libsodium_ver}-RELEASE/libsodium-${libsodium_ver}.tar.gz && Download_src
       ;;
     8)
       src_url=https://secure.php.net/distributions/php-${php73_ver}.tar.gz && Download_src
       #src_url=https://github.com/P-H-C/phc-winner-argon2/archive/${argon2_ver}.tar.gz && Download_src
       tar xzf argon2-${argon2_ver}.tar.gz
-      mv /root/oneinstack/src/phc-winner-argon2-20190702 /root/oneinstack/src/argon2-${argon2_ver}
       src_url=https://github.com/jedisct1/libsodium/releases/download/${libsodium_ver}-RELEASE/libsodium-${libsodium_ver}.tar.gz && Download_src
       ;;
     9)
       src_url=https://secure.php.net/distributions/php-${php74_ver}.tar.gz && Download_src
       #src_url=https://github.com/P-H-C/phc-winner-argon2/archive/${argon2_ver}.tar.gz && Download_src
       tar xzf argon2-${argon2_ver}.tar.gz
-      mv phc-winner-argon2-20190702 argon2-${argon2_ver}
       src_url=https://github.com/jedisct1/libsodium/releases/download/${libsodium_ver}-RELEASE/libsodium-${libsodium_ver}.tar.gz && Download_src
       src_url=https://github.com/nih-at/libzip/releases/download/v${libzip_ver}/libzip-${libzip_ver}.tar.gz && Download_src
       ;;
@@ -246,7 +243,7 @@ checkDownload() {
   # graphicsmagick
   if [ "${pecl_gmagick}" == '1' ]; then
     echo "Download graphicsmagick..."
-    src_url=http://downloads.sourceforge.net/project/graphicsmagick/graphicsmagick/${graphicsmagick_ver}/GraphicsMagick-${graphicsmagick_ver}.tar.gz && Download_src
+    src_url=https://downloads.sourceforge.net/project/graphicsmagick/graphicsmagick/${graphicsmagick_ver}/GraphicsMagick-${graphicsmagick_ver}.tar.gz && Download_src
     if [[ "${php_option}" =~ ^[1-4]$ ]]; then
       echo "Download gmagick for php..."
       src_url=https://pecl.php.net/get/gmagick-${gmagick_oldver}.tgz && Download_src
@@ -259,7 +256,7 @@ checkDownload() {
   # redis-server
   if [ "${redis_flag}" == 'y' ]; then
     echo "Download redis-server..."
-    src_url=http://download.redis.io/releases/redis-${redis_ver}.tar.gz && Download_src
+    src_url=https://download.redis.io/releases/redis-${redis_ver}.tar.gz && Download_src
     if [ "${PM}" == 'yum' ]; then
       echo "Download start-stop-daemon.c for CentOS..."
       src_url=https://raw.githubusercontent.com/daleobrien/start-stop-daemon/master/start-stop-daemon.c && Download_src
