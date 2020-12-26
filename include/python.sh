@@ -1,12 +1,5 @@
 #!/bin/bash
 # Author:  yeho <lj2007331 AT gmail.com>
-# BLOG:  https://linuxeye.com
-#
-# Notes: OneinStack for CentOS/RedHat 6+ Debian 8+ and Ubuntu 14+
-#
-# Project home page:
-#       https://oneinstack.com
-#       https://github.com/oneinstack/oneinstack
 
 Install_Python() {
   if [ -e "${python_install_dir}/bin/python" ]; then
@@ -29,7 +22,7 @@ Install_Python() {
 
     # Install Python3
     if [ ! -e "${python_install_dir}/bin/python" -a ! -e "${python_install_dir}/bin/python3" ] ;then
-      src_url=http://mirrors.linuxeye.com/oneinstack/src/Python-${python_ver}.tgz && Download_src
+      src_url=https://www.python.org/ftp/python/${python_ver}/Python-${python_ver}.tgz && Download_src
       tar xzf Python-${python_ver}.tgz
       pushd Python-${python_ver} > /dev/null
       ./configure --prefix=${python_install_dir}
@@ -40,8 +33,6 @@ Install_Python() {
     fi
 
     if [ ! -e "${python_install_dir}/bin/pip" ]; then
-      src_url=http://mirrors.linuxeye.com/oneinstack/src/setuptools-${setuptools_ver}.zip && Download_src
-      src_url=http://mirrors.linuxeye.com/oneinstack/src/pip-${pip_ver}.tar.gz && Download_src
       unzip -q setuptools-${setuptools_ver}.zip
       tar xzf pip-${pip_ver}.tar.gz
       pushd setuptools-${setuptools_ver} > /dev/null
@@ -52,15 +43,6 @@ Install_Python() {
       popd > /dev/null
     fi
 
-    if [ ! -e "/root/.pip/pip.conf" ] ;then
-      # get the IP information
-      PUBLIC_IPADDR=$(../include/get_public_ipaddr.py)
-      IPADDR_COUNTRY=$(../include/get_ipaddr_state.py ${PUBLIC_IPADDR})
-      if [ "${IPADDR_COUNTRY}"x == "CN"x ]; then
-        [ ! -d "/root/.pip" ] && mkdir /root/.pip
-        echo -e "[global]\nindex-url = https://pypi.tuna.tsinghua.edu.cn/simple" > /root/.pip/pip.conf
-      fi
-    fi
 
     if [ -e "${python_install_dir}/bin/python3" ]; then
       echo "${CSUCCESS}Python ${python_ver} installed successfully! ${CEND}"
