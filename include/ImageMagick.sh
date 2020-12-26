@@ -1,5 +1,5 @@
 #!/bin/bash
-# Author:  yeho <lj2007331 AT gmail.com>
+
 
 
 Install_ImageMagick() {
@@ -7,7 +7,7 @@ Install_ImageMagick() {
     echo "${CWARNING}ImageMagick already installed! ${CEND}"
   else
     pushd ${oneinstack_dir}/src > /dev/null
-    tar xzf ${imagemagick_ver}.tar.gz
+    tar xzf ImageMagick-${imagemagick_ver}.tar.gz
     pushd ImageMagick-${imagemagick_ver} > /dev/null
     ./configure --prefix=${imagick_install_dir} --enable-shared --enable-static
     make -j ${THREAD} && make install
