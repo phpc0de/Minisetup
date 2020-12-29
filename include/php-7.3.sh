@@ -28,16 +28,7 @@ Install_PHP73() {
     rm -rf curl-${curl_ver}
   fi
 
-  if [ ! -e "${freetype_install_dir}/lib/libfreetype.la" ]; then
-    tar xzf freetype-${freetype_ver}.tar.gz
-    pushd freetype-${freetype_ver} > /dev/null
-    ./configure --prefix=${freetype_install_dir} --enable-freetype-config
-    make -j ${THREAD} && make install
-    ln -sf ${freetype_install_dir}/include/freetype2/* /usr/include/
-    [ -d /usr/lib/pkgconfig ] && /bin/cp ${freetype_install_dir}/lib/pkgconfig/freetype2.pc /usr/lib/pkgconfig/
-    popd > /dev/null
-    rm -rf freetype-${freetype_ver}
-  fi
+
 
   if [ ! -e "/usr/lib/libargon2.a" ]; then
     tar xzf argon2-${argon2_ver}.tar.gz
@@ -92,7 +83,7 @@ Install_PHP73() {
     --with-config-file-scan-dir=${php_install_dir}/etc/php.d \
     --with-apxs2=${apache_install_dir}/bin/apxs ${phpcache_arg} --disable-fileinfo \
     --enable-mysqlnd --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd \
-    --with-iconv-dir=${libiconv_install_dir} --with-freetype-dir=${freetype_install_dir} --with-jpeg-dir --with-png-dir --with-zlib \
+    --with-iconv-dir=${libiconv_install_dir} --with-jpeg-dir --with-png-dir --with-zlib \
     --with-libxml-dir=/usr --enable-xml --disable-rpath --enable-bcmath --enable-shmop --enable-exif \
     --enable-sysvsem --enable-inline-optimization --with-curl=${curl_install_dir} --enable-mbregex \
     --enable-mbstring --with-password-argon2 --with-sodium=/usr/local --with-gd --with-openssl=${openssl_install_dir} \
@@ -103,7 +94,7 @@ Install_PHP73() {
     --with-config-file-scan-dir=${php_install_dir}/etc/php.d \
     --with-fpm-user=${run_user} --with-fpm-group=${run_group} --enable-fpm ${phpcache_arg} --disable-fileinfo \
     --enable-mysqlnd --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd \
-    --with-iconv-dir=${libiconv_install_dir} --with-freetype-dir=${freetype_install_dir} --with-jpeg-dir --with-png-dir --with-zlib \
+    --with-iconv-dir=${libiconv_install_dir}  --with-jpeg-dir --with-png-dir --with-zlib \
     --with-libxml-dir=/usr --enable-xml --disable-rpath --enable-bcmath --enable-shmop --enable-exif \
     --enable-sysvsem --enable-inline-optimization --with-curl=${curl_install_dir} --enable-mbregex \
     --enable-mbstring --with-password-argon2 --with-sodium=/usr/local --with-gd --with-openssl=${openssl_install_dir} \
