@@ -63,7 +63,7 @@ curl_ver=7.74.0
 libmcrypt_ver=2.5.8
 mcrypt_ver=2.6.8
 mhash_ver=0.9.9.9
-freetype_ver=2.10.4
+freetype_ver=2.10.1
 icu4c_ver=68
 icu4c_ver2=2
 
