@@ -38,9 +38,9 @@ Show_Help() {
   echo "Usage: $0  command ...[parameters]....
   --help, -h                  Show this help message, More: https://oneinstack.com/auto
   --version, -v               Show version info
-  --nginx_option [1-3]        Install Nginx server version
+  --nginx_option [1]          Install Nginx server version
   --php_option [1-9]          Install PHP version
-  --mphp_ver [53~74]          Install another PHP version (PATH: ${php_install_dir}\${mphp_ver})
+  --mphp_ver [70~81]          Install another PHP version (PATH: ${php_install_dir}\${mphp_ver})
   --mphp_addons               Only install another PHP addons
   --phpcache_option [1-4]     Install PHP opcode cache, default: 1 opcache
   --php_extensions [ext name] Install PHP extensions, include zendguardloader,ioncube,
@@ -48,20 +48,19 @@ Show_Help() {
                               yaf,yar,redis,memcached,memcache,mongodb,swoole,xdebug
 
 
-  --db_option [1-15]          Install DB version
+  --db_option [1-14]          Install DB version
   --dbinstallmethod [1-2]     DB install method, default: 1 binary install
   --dbrootpwd [password]      DB super password
   --pureftpd                  Install Pure-Ftpd
   --redis                     Install Redis
   --memcached                 Install Memcached
   --phpmyadmin                Install phpMyAdmin
-  --hhvm                      Install HHVM
-
+  --python                    Install Python (PATH: ${python_install_dir})
   --reboot                    Restart the server after installation
   "
 }
 ARG_NUM=$#
-TEMP=`getopt -o hvV --long help,version,nginx_option:,php_option:,mphp_ver:,mphp_addons,phpcache_option:,php_extensions:,db_option:,dbrootpwd:,dbinstallmethod:,pureftpd,redis,memcached,phpmyadmin,hhvm,reboot -- "$@" 2>/dev/null`
+TEMP=`getopt -o hvV --long help,version,nginx_option:,php_option:,mphp_ver:,mphp_addons,phpcache_option:,php_extensions:,db_option:,dbrootpwd:,dbinstallmethod:,pureftpd,redis,memcached,phpmyadmin,python,reboot -- "$@" 2>/dev/null`
 [ $? != 0 ] && echo "${CWARNING}ERROR: unknown argument! ${CEND}" && Show_Help && exit 1
 eval set -- "${TEMP}"
 while :; do
@@ -75,10 +74,8 @@ while :; do
       ;;
     --nginx_option)
       nginx_option=$2; shift 2
-      [[ ! ${nginx_option} =~ ^[1-3]$ ]] && { echo "${CWARNING}nginx_option input error! Please only input number 1~3${CEND}"; exit 1; }
+      [[ ! ${nginx_option} =~ ^[1-1]$ ]] && { echo "${CWARNING}nginx_option input error! Please only input number 1~1${CEND}"; exit 1; }
       [ -e "${nginx_install_dir}/sbin/nginx" ] && { echo "${CWARNING}Nginx already installed! ${CEND}"; unset nginx_option; }
-      [ -e "${tengine_install_dir}/sbin/nginx" ] && { echo "${CWARNING}Tengine already installed! ${CEND}"; unset nginx_option; }
-      [ -e "${openresty_install_dir}/nginx/sbin/nginx" ] && { echo "${CWARNING}OpenResty already installed! ${CEND}"; unset nginx_option; }
       ;;
 
     --php_option)
@@ -123,7 +120,9 @@ while :; do
       db_option=$2; shift 2
       if [[ "${db_option}" =~ ^[1-9]$|^1[0-3]$ ]]; then
         [ -d "${db_install_dir}/support-files" ] && { echo "${CWARNING}MySQL already installed! ${CEND}"; unset db_option; }
-      elif [ "${db_option}" == '15' ]; then
+      elif [ "${db_option}" == '13' ]; then
+        [ -e "${pgsql_install_dir}/bin/psql" ] && { echo "${CWARNING}PostgreSQL already installed! ${CEND}"; unset db_option; }
+      elif [ "${db_option}" == '14' ]; then
         [ -e "${mongo_install_dir}/bin/mongo" ] && { echo "${CWARNING}MongoDB already installed! ${CEND}"; unset db_option; }
       else
         echo "${CWARNING}db_option input error! Please only input number 1~15${CEND}"
@@ -155,9 +154,8 @@ while :; do
       phpmyadmin_flag=y; shift 1
       [ -d "${wwwroot_dir}/default/phpMyAdmin" ] && { echo "${CWARNING}phpMyAdmin already installed! ${CEND}"; unset phpmyadmin_flag; }
       ;;
-    --hhvm)
-      hhvm_flag=y; shift 1
-      [ -e "/usr/bin/hhvm" ] && { echo "${CWARNING}HHVM already installed! ${CEND}"; unset hhvm_flag; }
+    --python)
+      python_flag=y; shift 1
       ;;
     --reboot)
       reboot_flag=y; shift 1
@@ -192,12 +190,10 @@ if [ ${ARG_NUM} == 0 ]; then
       echo "${CWARNING}input error! Please only input 'y' or 'n'${CEND}"
     else
       if [ "${web_flag}" == 'y' ]; then
-        # Nginx/Tegine/OpenResty
+        # Nginx
         while :; do echo
           echo 'Please select Nginx server:'
           echo -e "\t${CMSG}1${CEND}. Install Nginx"
-          echo -e "\t${CMSG}2${CEND}. Install Tengine"
-          echo -e "\t${CMSG}3${CEND}. Install OpenResty"
           echo -e "\t${CMSG}4${CEND}. Do not install"
           read -e -p "Please input a number:(Default 1 press Enter) " nginx_option
           nginx_option=${nginx_option:-1}
@@ -205,8 +201,6 @@ if [ ${ARG_NUM} == 0 ]; then
             echo "${CWARNING}input error! Please only input number 1~4${CEND}"
           else
             [ "${nginx_option}" != '4' -a -e "${nginx_install_dir}/sbin/nginx" ] && { echo "${CWARNING}Nginx already installed! ${CEND}"; unset nginx_option; }
-            [ "${nginx_option}" != '4' -a -e "${tengine_install_dir}/sbin/nginx" ] && { echo "${CWARNING}Tengine already installed! ${CEND}"; unset nginx_option; }
-            [ "${nginx_option}" != '4' -a -e "${openresty_install_dir}/nginx/sbin/nginx" ] && { echo "${CWARNING}OpenResty already installed! ${CEND}"; unset nginx_option; }
             break
           fi
         done
@@ -230,23 +224,24 @@ if [ ${ARG_NUM} == 0 ]; then
           echo -e "\t${CMSG} 2${CEND}. Install MySQL-5.7"
           echo -e "\t${CMSG} 3${CEND}. Install MySQL-5.6"
           echo -e "\t${CMSG} 4${CEND}. Install MySQL-5.5"
-          echo -e "\t${CMSG}15${CEND}. Install MongoDB"
+          echo -e "\t${CMSG}13${CEND}. Install PostgreSQL"
+          echo -e "\t${CMSG}14${CEND}. Install MongoDB"
           read -e -p "Please input a number:(Default 2 press Enter) " db_option
           db_option=${db_option:-2}
           [[ "${db_option}" =~ ^9$|^15$ ]] && [ "${OS_BIT}" == '32' ] && { echo "${CWARNING}By not supporting 32-bit! ${CEND}"; continue; }
           if [[ "${db_option}" =~ ^[1-9]$|^1[0-5]$ ]]; then
-            if [ "${db_option}" == '14' ]; then
+            if [ "${db_option}" == '13' ]; then
               [ -e "${pgsql_install_dir}/bin/psql" ] && { echo "${CWARNING}PostgreSQL already installed! ${CEND}"; unset db_option; break; }
-            elif [ "${db_option}" == '15' ]; then
+            elif [ "${db_option}" == '14' ]; then
               [ -e "${mongo_install_dir}/bin/mongo" ] && { echo "${CWARNING}MongoDB already installed! ${CEND}"; unset db_option; break; }
             else
               [ -d "${db_install_dir}/support-files" ] && { echo "${CWARNING}MySQL already installed! ${CEND}"; unset db_option; break; }
             fi
             while :; do
-              if [ "${db_option}" == '14' ]; then
+              if [ "${db_option}" == '13' ]; then
                 read -e -p "Please input the postgres password of PostgreSQL(default: ${dbpostgrespwd}): " dbpwd
                 dbpwd=${dbpwd:-${dbpostgrespwd}}
-              elif [ "${db_option}" == '15' ]; then
+              elif [ "${db_option}" == '14' ]; then
                 read -e -p "Please input the root password of MongoDB(default: ${dbmongopwd}): " dbpwd
                 dbpwd=${dbpwd:-${dbmongopwd}}
               else
@@ -255,9 +250,9 @@ if [ ${ARG_NUM} == 0 ]; then
               fi
               [ -n "`echo ${dbpwd} | grep '[+|&]'`" ] && { echo "${CWARNING}input error,not contain a plus sign (+) and & ${CEND}"; continue; }
               if (( ${#dbpwd} >= 5 )); then
-                if [ "${db_option}" == '14' ]; then
+                if [ "${db_option}" == '13' ]; then
                   dbpostgrespwd=${dbpwd}
-                elif [ "${db_option}" == '15' ]; then
+                elif [ "${db_option}" == '14' ]; then
                   dbmongopwd=${dbpwd}
                 else
                   dbrootpwd=${dbpwd}
@@ -284,7 +279,7 @@ if [ ${ARG_NUM} == 0 ]; then
             fi
             break
           else
-            echo "${CWARNING}input error! Please only input number 1~15${CEND}"
+            echo "${CWARNING}input error! Please only input number 1~14${CEND}"
           fi
         done
       fi
@@ -302,15 +297,17 @@ if [ ${ARG_NUM} == 0 ]; then
         [ -e "${php_install_dir}/bin/phpize" ] && { echo "${CWARNING}PHP already installed! ${CEND}"; unset php_option; break; }
         while :; do echo
           echo 'Please select a version of the PHP:'
-          echo -e "\t${CMSG}5${CEND}. Install php-7.0"
-          echo -e "\t${CMSG}6${CEND}. Install php-7.1"
-          echo -e "\t${CMSG}7${CEND}. Install php-7.2"
-          echo -e "\t${CMSG}8${CEND}. Install php-7.3"
-          echo -e "\t${CMSG}9${CEND}. Install php-7.4"
-          read -e -p "Please input a number:(Default 7 press Enter) " php_option
+          echo -e "\t${CMSG} 5${CEND}. Install php-7.0"
+          echo -e "\t${CMSG} 6${CEND}. Install php-7.1"
+          echo -e "\t${CMSG} 7${CEND}. Install php-7.2"
+          echo -e "\t${CMSG} 8${CEND}. Install php-7.3"
+          echo -e "\t${CMSG} 9${CEND}. Install php-7.4"
+          echo -e "\t${CMSG}10${CEND}. Install php-8.0"
+          echo -e "\t${CMSG}11${CEND}. Install php-8.1"
+          read -e -p "Please input a number:(Default 8 press Enter) " php_option
           php_option=${php_option:-8}
-          if [[ ! ${php_option} =~ ^[1-9]$ ]]; then
-            echo "${CWARNING}input error! Please only input number 1~9${CEND}"
+          if [[ ! ${php_option} =~ ^[1-9]$|^1[0-1]$ ]]; then
+            echo "${CWARNING}input error! Please only input number 1~11${CEND}"
           else
             break
           fi
@@ -352,7 +349,13 @@ if [ ${ARG_NUM} == 0 ]; then
         break
       fi
     done
-
+    # set xcache passwd
+    if [ "${phpcache_option}" == '3' ]; then
+      while :; do
+        read -e -p "Please input xcache admin password: " xcachepwd
+        (( ${#xcachepwd} >= 5 )) && { xcachepwd_md5=$(echo -n "${xcachepwd}" | md5sum | awk '{print $1}') ; break ; } || echo "${CFAILURE}xcache admin password least 5 characters! ${CEND}"
+      done
+    fi
     # PHP extension
     while :; do
       echo
@@ -455,26 +458,6 @@ if [ ${ARG_NUM} == 0 ]; then
     fi
   done
 
-  while :; do echo
-    read -e -p "Do you want to install HHVM? [y/n]: " hhvm_flag
-    if [[ ! ${hhvm_flag} =~ ^[y,n]$ ]]; then
-      echo "${CWARNING}input error! Please only input 'y' or 'n'${CEND}"
-    else
-      if [ "${hhvm_flag}" == 'y' ]; then
-        [ -e "/usr/bin/hhvm" ] && { echo "${CWARNING}HHVM already installed! ${CEND}"; unset hhvm_flag; break; }
-        if [ "${PM}" == 'yum' -a "${OS_BIT}" == '64' ] && [ -n "`grep -E ' 7\.| 6\.[5-9]' /etc/redhat-release`" ]; then
-          break
-        else
-          echo
-          echo "${CWARNING}HHVM only support CentOS6.5+ 64bit, CentOS7 64bit! ${CEND}"
-          echo "Press Ctrl+c to cancel or Press any key to continue..."
-          char=`get_char`
-          unset hhvm_flag
-        fi
-      fi
-      break
-    fi
-  done
 fi
 
 if [[ ${nginx_option} =~ ^[1-3]$ ]]; then
@@ -499,6 +482,7 @@ IPADDR_COUNTRY="US"
 
 # Check download source packages
 . ./include/check_download.sh
+[ "${armplatform}" == "y" ] && dbinstallmethod=2
 checkDownload 2>&1 | tee -a ${oneinstack_dir}/install.log
 
 
@@ -514,10 +498,10 @@ checkDownload 2>&1 | tee -a ${oneinstack_dir}/install.log
 if [ ! -e ~/.oneinstack ]; then
   # Check binary dependencies packages
   . ./include/check_sw.sh
-  case "${OS}" in
-    "CentOS")
-      installDepsCentOS 2>&1 | tee ${oneinstack_dir}/install.log
-      . include/init_CentOS.sh 2>&1 | tee -a ${oneinstack_dir}/install.log
+  case "${LikeOS}" in
+    "RHEL")
+      installDepsRHEL 2>&1 | tee ${oneinstack_dir}/install.log
+      . include/init_RHEL.sh 2>&1 | tee -a ${oneinstack_dir}/install.log
       ;;
   esac
   # Install dependencies from source package
@@ -549,7 +533,11 @@ case "${db_option}" in
     . include/mysql-5.6.sh
     Install_MySQL56 2>&1 | tee -a ${oneinstack_dir}/install.log
     ;;
-  15)
+  13)
+    . include/postgresql.sh
+    Install_PostgreSQL 2>&1 | tee -a ${oneinstack_dir}/install.log
+    ;;
+  14)
     . include/mongodb.sh
     Install_MongoDB 2>&1 | tee -a ${oneinstack_dir}/install.log
     ;;
@@ -585,6 +573,14 @@ case "${php_option}" in
     . include/php-7.4.sh
     Install_PHP74 2>&1 | tee -a ${oneinstack_dir}/install.log
     ;;
+  10)
+    . include/php-8.0.sh
+    Install_PHP80 2>&1 | tee -a ${oneinstack_dir}/install.log
+    ;;
+  11)
+    . include/php-8.1.sh
+    Install_PHP81 2>&1 | tee -a ${oneinstack_dir}/install.log
+    ;;
 esac
 
 PHP_addons() {
@@ -593,18 +589,6 @@ PHP_addons() {
     1)
       . include/zendopcache.sh
       Install_ZendOPcache 2>&1 | tee -a ${oneinstack_dir}/install.log
-      ;;
-    2)
-      . include/xcache.sh
-      Install_XCache 2>&1 | tee -a ${oneinstack_dir}/install.log
-      ;;
-    3)
-      . include/apcu.sh
-      Install_APCU 2>&1 | tee -a ${oneinstack_dir}/install.log
-      ;;
-    4)
-      . include/eaccelerator.sh
-      Install_eAccelerator 2>&1 | tee -a ${oneinstack_dir}/install.log
       ;;
   esac
 
@@ -717,7 +701,11 @@ PHP_addons() {
     . include/pecl_xdebug.sh
     Install_pecl_xdebug 2>&1 | tee -a ${oneinstack_dir}/install.log
   fi
-
+  # pecl_pgsql
+  if [ -e "${pgsql_install_dir}/bin/psql" ]; then
+    . include/pecl_pgsql.sh
+    Install_pecl_pgsql 2>&1 | tee -a ${oneinstack_dir}/install.log
+  fi
 }
 
 [ "${mphp_addons_flag}" != 'y' ] && PHP_addons
@@ -763,12 +751,13 @@ fi
 # get web_install_dir and db_install_dir
 . include/check_dir.sh
 
-# HHVM
-if [ "${hhvm_flag}" == 'y' ] && [ "${PM}" == 'yum' -a "${OS_BIT}" == '64' ] && [ -n "`grep -E ' 7\.| 6\.[5-9]' /etc/redhat-release`" ]; then
-  . include/hhvm_CentOS.sh
-  Install_hhvm_CentOS 2>&1 | tee -a ${oneinstack_dir}/install.log
-fi
 
+
+# Python
+if [ "${python_flag}" == 'y' ]; then
+  . include/python.sh
+  Install_Python 2>&1 | tee -a ${oneinstack_dir}/install.log
+fi
 
 
 
@@ -790,10 +779,14 @@ echo "Total Minisetup Install Time: ${CQUESTION}${installTime}${CEND} minutes"
 [[ "${db_option}" =~ ^[1-9]$|^1[0-3]$ ]] && echo "$(printf "%-32s" "Database data dir:")${CMSG}${db_data_dir}${CEND}"
 [[ "${db_option}" =~ ^[1-9]$|^1[0-3]$ ]] && echo "$(printf "%-32s" "Database user:")${CMSG}root${CEND}"
 [[ "${db_option}" =~ ^[1-9]$|^1[0-3]$ ]] && echo "$(printf "%-32s" "Database password:")${CMSG}${dbrootpwd}${CEND}"
-[ "${db_option}" == '15' ] && echo -e "\n$(printf "%-32s" "MongoDB install dir:")${CMSG}${mongo_install_dir}${CEND}"
-[ "${db_option}" == '15' ] && echo "$(printf "%-32s" "MongoDB data dir:")${CMSG}${mongo_data_dir}${CEND}"
-[ "${db_option}" == '15' ] && echo "$(printf "%-32s" "MongoDB user:")${CMSG}root${CEND}"
-[ "${db_option}" == '15' ] && echo "$(printf "%-32s" "MongoDB password:")${CMSG}${dbmongopwd}${CEND}"
+[ "${db_option}" == '13' ] && echo -e "\n$(printf "%-32s" "PostgreSQL install dir:")${CMSG}${pgsql_install_dir}${CEND}"
+[ "${db_option}" == '13' ] && echo "$(printf "%-32s" "PostgreSQL data dir:")${CMSG}${pgsql_data_dir}${CEND}"
+[ "${db_option}" == '13' ] && echo "$(printf "%-32s" "PostgreSQL user:")${CMSG}postgres${CEND}"
+[ "${db_option}" == '13' ] && echo "$(printf "%-32s" "postgres password:")${CMSG}${dbpostgrespwd}${CEND}"
+[ "${db_option}" == '14' ] && echo -e "\n$(printf "%-32s" "MongoDB install dir:")${CMSG}${mongo_install_dir}${CEND}"
+[ "${db_option}" == '14' ] && echo "$(printf "%-32s" "MongoDB data dir:")${CMSG}${mongo_data_dir}${CEND}"
+[ "${db_option}" == '14' ] && echo "$(printf "%-32s" "MongoDB user:")${CMSG}root${CEND}"
+[ "${db_option}" == '14' ] && echo "$(printf "%-32s" "MongoDB password:")${CMSG}${dbmongopwd}${CEND}"
 [[ "${php_option}" =~ ^[1-9]$ ]] && echo -e "\n$(printf "%-32s" "PHP install dir:")${CMSG}${php_install_dir}${CEND}"
 [ "${phpcache_option}" == '1' ] && echo "$(printf "%-32s" "Opcache Control Panel URL:")${CMSG}http://${IPADDR}/ocp.php${CEND}"
 [ "${pureftpd_flag}" == 'y' ] && echo -e "\n$(printf "%-32s" "Pure-FTPd install dir:")${CMSG}${pureftpd_install_dir}${CEND}"
