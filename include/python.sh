@@ -33,6 +33,8 @@ Install_Python() {
     fi
 
     if [ ! -e "${python_install_dir}/bin/pip" ]; then
+      src_url=https://github.com/pypa/setuptools/archive/refs/tags/v${setuptools_ver}.zip && Download_src
+      src_url=https://github.com/pypa/pip/archive/refs/tags/${pip_ver}.tar.gz && Download_src
       unzip -q setuptools-${setuptools_ver}.zip
       tar xzf pip-${pip_ver}.tar.gz
       pushd setuptools-${setuptools_ver} > /dev/null
