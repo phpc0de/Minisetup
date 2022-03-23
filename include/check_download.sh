@@ -42,7 +42,7 @@ checkDownload() {
   # pcre
   if [[ "${nginx_option}" =~ ^[1-3]$ || ${apache_option} == '1' ]]; then
     echo "Download pcre..."
-    src_url=https://ftp.pcre.org/pub/pcre/pcre-${pcre_ver}.tar.gz && Download_src
+    src_url=https://downloads.sourceforge.net/project/pcre/pcre/${pcre_ver}/pcre-${pcre_ver}.tar.gz && Download_src
   fi
 
 
