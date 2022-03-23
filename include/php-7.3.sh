@@ -8,10 +8,10 @@ Install_PHP73() {
     [ "$(${apache_install_dir}/bin/httpd -v | awk -F'.' /version/'{print $2}')" == '4' ] && Apache_main_ver=24
     [ "$(${apache_install_dir}/bin/httpd -v | awk -F'.' /version/'{print $2}')" == '2' ] && Apache_main_ver=22
   fi
-  if [ ! -e "${libiconv_install_dir}/lib/libiconv.la" ]; then
+  if [ ! -e "/usr/local/lib/libiconv.la" ]; then
     tar xzf libiconv-${libiconv_ver}.tar.gz
     pushd libiconv-${libiconv_ver} > /dev/null
-    ./configure --prefix=${libiconv_install_dir}
+    ./configure 
     make -j ${THREAD} && make install
     popd > /dev/null
     rm -rf libiconv-${libiconv_ver}
@@ -30,10 +30,24 @@ Install_PHP73() {
 
 
 
-  if [ ! -e "/usr/lib/libargon2.a" ]; then
+
+  if [ ! -e "${freetype_install_dir}/lib/libfreetype.la" ]; then
+    tar xzf freetype-${freetype_ver}.tar.gz
+    pushd freetype-${freetype_ver} > /dev/null
+    ./configure --prefix=${freetype_install_dir} --enable-freetype-config
+    make -j ${THREAD} && make install
+    ln -sf ${freetype_install_dir}/include/freetype2/* /usr/include/
+    [ -d /usr/lib/pkgconfig ] && /bin/cp ${freetype_install_dir}/lib/pkgconfig/freetype2.pc /usr/lib/pkgconfig/
+    popd > /dev/null
+    rm -rf freetype-${freetype_ver}
+  fi
+
+  if [ ! -e "/usr/local/lib/pkgconfig/libargon2.pc" ]; then
     tar xzf argon2-${argon2_ver}.tar.gz
     pushd argon2-${argon2_ver} > /dev/null
     make -j ${THREAD} && make install
+    [ ! -d /usr/local/lib/pkgconfig ] && mkdir -p /usr/local/lib/pkgconfig
+    /bin/cp libargon2.pc /usr/local/lib/pkgconfig/
     popd > /dev/null
     rm -rf argon2-${argon2_ver}
   fi
@@ -78,12 +92,12 @@ Install_PHP73() {
   make clean
   [ ! -d "${php_install_dir}" ] && mkdir -p ${php_install_dir}
   [ "${phpcache_option}" == '1' ] && phpcache_arg='--enable-opcache' || phpcache_arg='--disable-opcache'
-  if [ "${apache_option}" == '2' ] || [ "${Apache_main_ver}" == '22' ] || [ "${apache_mode_option}" == '2' ]; then
+  if [ "${Apache_main_ver}" == '22' ] || [ "${apache_mode_option}" == '2' ]; then
     ./configure --prefix=${php_install_dir} --with-config-file-path=${php_install_dir}/etc \
     --with-config-file-scan-dir=${php_install_dir}/etc/php.d \
     --with-apxs2=${apache_install_dir}/bin/apxs ${phpcache_arg} --disable-fileinfo \
     --enable-mysqlnd --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd \
-    --with-iconv-dir=${libiconv_install_dir} --with-jpeg-dir --with-png-dir --with-zlib \
+    --with-iconv-dir=/usr/local --with-freetype-dir=${freetype_install_dir} --with-jpeg-dir --with-png-dir --with-zlib \
     --with-libxml-dir=/usr --enable-xml --disable-rpath --enable-bcmath --enable-shmop --enable-exif \
     --enable-sysvsem --enable-inline-optimization --with-curl=${curl_install_dir} --enable-mbregex \
     --enable-mbstring --with-password-argon2 --with-sodium=/usr/local --with-gd --with-openssl=${openssl_install_dir} \
@@ -94,7 +108,7 @@ Install_PHP73() {
     --with-config-file-scan-dir=${php_install_dir}/etc/php.d \
     --with-fpm-user=${run_user} --with-fpm-group=${run_group} --enable-fpm ${phpcache_arg} --disable-fileinfo \
     --enable-mysqlnd --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd \
-    --with-iconv-dir=${libiconv_install_dir}  --with-jpeg-dir --with-png-dir --with-zlib \
+    --with-iconv-dir=/usr/local --with-freetype-dir=${freetype_install_dir} --with-jpeg-dir --with-png-dir --with-zlib \
     --with-libxml-dir=/usr --enable-xml --disable-rpath --enable-bcmath --enable-shmop --enable-exif \
     --enable-sysvsem --enable-inline-optimization --with-curl=${curl_install_dir} --enable-mbregex \
     --enable-mbstring --with-password-argon2 --with-sodium=/usr/local --with-gd --with-openssl=${openssl_install_dir} \
@@ -105,11 +119,12 @@ Install_PHP73() {
   make install
 
   if [ -e "${php_install_dir}/bin/phpize" ]; then
+    [ ! -e "${php_install_dir}/etc/php.d" ] && mkdir -p ${php_install_dir}/etc/php.d
     echo "${CSUCCESS}PHP installed successfully! ${CEND}"
   else
     rm -rf ${php_install_dir}
     echo "${CFAILURE}PHP install failed, Please Contact the author! ${CEND}"
-    kill -9 $$
+    kill -9 $$; exit 1;
   fi
 
   [ -z "`grep ^'export PATH=' /etc/profile`" ] && echo "export PATH=${php_install_dir}/bin:\$PATH" >> /etc/profile
@@ -119,7 +134,6 @@ Install_PHP73() {
   # wget -c http://pear.php.net/go-pear.phar
   # ${php_install_dir}/bin/php go-pear.phar
 
-  [ ! -e "${php_install_dir}/etc/php.d" ] && mkdir -p ${php_install_dir}/etc/php.d
   /bin/cp php.ini-production ${php_install_dir}/etc/php.ini
 
   sed -i "s@^memory_limit.*@memory_limit = ${Memory_limit}M@" ${php_install_dir}/etc/php.ini
