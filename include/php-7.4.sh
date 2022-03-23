@@ -2,7 +2,7 @@
 # Author:  yeho <lj2007331 AT gmail.com>
 # BLOG:  https://linuxeye.com
 #
-# Notes: OneinStack for CentOS/RedHat 6+ Debian 8+ and Ubuntu 14+
+# Notes: OneinStack for CentOS/RedHat 7+ Debian 8+ and Ubuntu 16+
 #
 # Project home page:
 #       https://oneinstack.com
@@ -14,10 +14,10 @@ Install_PHP74() {
     [ "$(${apache_install_dir}/bin/httpd -v | awk -F'.' /version/'{print $2}')" == '4' ] && Apache_main_ver=24
     [ "$(${apache_install_dir}/bin/httpd -v | awk -F'.' /version/'{print $2}')" == '2' ] && Apache_main_ver=22
   fi
-  if [ ! -e "${libiconv_install_dir}/lib/libiconv.la" ]; then
+  if [ ! -e "/usr/local/lib/libiconv.la" ]; then
     tar xzf libiconv-${libiconv_ver}.tar.gz
     pushd libiconv-${libiconv_ver} > /dev/null
-    ./configure --prefix=${libiconv_install_dir}
+    ./configure
     make -j ${THREAD} && make install
     popd > /dev/null
     rm -rf libiconv-${libiconv_ver}
@@ -45,10 +45,12 @@ Install_PHP74() {
     rm -rf freetype-${freetype_ver}
   fi
 
-  if [ ! -e "/usr/lib/libargon2.a" ]; then
+  if [ ! -e "/usr/local/lib/pkgconfig/libargon2.pc" ]; then
     tar xzf argon2-${argon2_ver}.tar.gz
     pushd argon2-${argon2_ver} > /dev/null
     make -j ${THREAD} && make install
+    [ ! -d /usr/local/lib/pkgconfig ] && mkdir -p /usr/local/lib/pkgconfig
+    /bin/cp libargon2.pc /usr/local/lib/pkgconfig/
     popd > /dev/null
     rm -rf argon2-${argon2_ver}
   fi
@@ -103,12 +105,12 @@ Install_PHP74() {
   export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/:$PKG_CONFIG_PATH
   [ ! -d "${php_install_dir}" ] && mkdir -p ${php_install_dir}
   [ "${phpcache_option}" == '1' ] && phpcache_arg='--enable-opcache' || phpcache_arg='--disable-opcache'
-  if [ "${apache_option}" == '2' ] || [ "${Apache_main_ver}" == '22' ] || [ "${apache_mode_option}" == '2' ]; then
+  if [ "${Apache_main_ver}" == '22' ] || [ "${apache_mode_option}" == '2' ]; then
     ./configure --prefix=${php_install_dir} --with-config-file-path=${php_install_dir}/etc \
     --with-config-file-scan-dir=${php_install_dir}/etc/php.d \
     --with-apxs2=${apache_install_dir}/bin/apxs ${phpcache_arg} --disable-fileinfo \
     --enable-mysqlnd --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd \
-    --with-iconv-dir=${libiconv_install_dir} --with-freetype --with-jpeg --with-zlib \
+    --with-iconv-dir=/usr/local --with-freetype --with-jpeg --with-zlib \
     --enable-xml --disable-rpath --enable-bcmath --enable-shmop --enable-exif \
     --enable-sysvsem --enable-inline-optimization --with-curl=${curl_install_dir} --enable-mbregex \
     --enable-mbstring --with-password-argon2 --with-sodium=/usr/local --enable-gd --with-openssl=${openssl_install_dir} \
@@ -119,7 +121,7 @@ Install_PHP74() {
     --with-config-file-scan-dir=${php_install_dir}/etc/php.d \
     --with-fpm-user=${run_user} --with-fpm-group=${run_group} --enable-fpm ${phpcache_arg} --disable-fileinfo \
     --enable-mysqlnd --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd \
-    --with-iconv-dir=${libiconv_install_dir} --with-freetype --with-jpeg --with-zlib \
+    --with-iconv-dir=/usr/local --with-freetype --with-jpeg --with-zlib \
     --enable-xml --disable-rpath --enable-bcmath --enable-shmop --enable-exif \
     --enable-sysvsem --enable-inline-optimization --with-curl=${curl_install_dir} --enable-mbregex \
     --enable-mbstring --with-password-argon2 --with-sodium=/usr/local --enable-gd --with-openssl=${openssl_install_dir} \
@@ -130,11 +132,12 @@ Install_PHP74() {
   make install
 
   if [ -e "${php_install_dir}/bin/phpize" ]; then
+    [ ! -e "${php_install_dir}/etc/php.d" ] && mkdir -p ${php_install_dir}/etc/php.d
     echo "${CSUCCESS}PHP installed successfully! ${CEND}"
   else
     rm -rf ${php_install_dir}
     echo "${CFAILURE}PHP install failed, Please Contact the author! ${CEND}"
-    kill -9 $$
+    kill -9 $$; exit 1;
   fi
 
   [ -z "`grep ^'export PATH=' /etc/profile`" ] && echo "export PATH=${php_install_dir}/bin:\$PATH" >> /etc/profile
@@ -144,7 +147,6 @@ Install_PHP74() {
   # wget -c http://pear.php.net/go-pear.phar
   # ${php_install_dir}/bin/php go-pear.phar
 
-  [ ! -e "${php_install_dir}/etc/php.d" ] && mkdir -p ${php_install_dir}/etc/php.d
   /bin/cp php.ini-production ${php_install_dir}/etc/php.ini
 
   sed -i "s@^memory_limit.*@memory_limit = ${Memory_limit}M@" ${php_install_dir}/etc/php.ini
@@ -198,20 +200,25 @@ EOF
 ;;;;;;;;;;;;;;;;;;;;;
 ; FPM Configuration ;
 ;;;;;;;;;;;;;;;;;;;;;
+
 ;;;;;;;;;;;;;;;;;;
 ; Global Options ;
 ;;;;;;;;;;;;;;;;;;
+
 [global]
 pid = run/php-fpm.pid
 error_log = log/php-fpm.log
 log_level = warning
+
 emergency_restart_threshold = 30
 emergency_restart_interval = 60s
 process_control_timeout = 5s
 daemonize = yes
+
 ;;;;;;;;;;;;;;;;;;;;
 ; Pool Definitions ;
 ;;;;;;;;;;;;;;;;;;;;
+
 [${run_user}]
 listen = /dev/shm/php-cgi.sock
 listen.backlog = -1
@@ -221,6 +228,7 @@ listen.group = ${run_group}
 listen.mode = 0666
 user = ${run_user}
 group = ${run_group}
+
 pm = dynamic
 pm.max_children = 12
 pm.start_servers = 8
@@ -230,10 +238,12 @@ pm.max_requests = 2048
 pm.process_idle_timeout = 10s
 request_terminate_timeout = 120
 request_slowlog_timeout = 0
+
 pm.status_path = /php-fpm_status
 slowlog = var/log/slow.log
 rlimit_files = 51200
 rlimit_core = 0
+
 catch_workers_output = yes
 ;env[HOSTNAME] = $HOSTNAME
 env[PATH] = /usr/local/bin:/usr/bin:/bin
@@ -271,7 +281,7 @@ EOF
 
     service php-fpm start
 
-  elif [ "${apache_option}" == '2' ] || [ "${Apache_main_ver}" == '22' ] || [ "${apache_mode_option}" == '2' ]; then
+  elif [ "${Apache_main_ver}" == '22' ] || [ "${apache_mode_option}" == '2' ]; then
     service httpd restart
   fi
   popd > /dev/null
