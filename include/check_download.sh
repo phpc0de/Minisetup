@@ -244,7 +244,11 @@ checkDownload() {
     echo "Download ioncube..."
     src_url=https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_${SYS_BIT_d}.tar.gz && Download_src
   fi
-
+  # modsecurity
+  if [ "${pecl_modsecurity}" == '1' ]; then
+    echo "Download modsecurity..."
+    src_url=https://github.com/SpiderLabs/ModSecurity/releases/download/v${modsecurity_ver}/modsecurity-${modsecurity_ver}.tar.gz && Download_src
+  fi
 
 
   # imageMagick
