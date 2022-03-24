@@ -45,7 +45,7 @@ Show_Help() {
   --phpcache_option [1-4]     Install PHP opcode cache, default: 1 opcache
   --php_extensions [ext name] Install PHP extensions, include zendguardloader,ioncube,
                               sourceguardian,imagick,gmagick,fileinfo,imap,ldap,calendar,phalcon,
-                              yaf,yar,redis,memcached,memcache,mongodb,swoole,xdebug,modsecurity
+                              yaf,yar,redis,memcached,memcache,mongodb,swoole,xdebug
 
 
   --db_option [1-14]          Install DB version
@@ -56,6 +56,7 @@ Show_Help() {
   --memcached                 Install Memcached
   --phpmyadmin                Install phpMyAdmin
   --python                    Install Python (PATH: ${python_install_dir})
+  --modsecurity               Install modsecurity 
   --reboot                    Restart the server after installation
   "
 }
@@ -113,10 +114,13 @@ while :; do
       [ -n "`echo ${php_extensions} | grep -w mongodb`" ] && pecl_mongodb=1
       [ -n "`echo ${php_extensions} | grep -w swoole`" ] && pecl_swoole=1
       [ -n "`echo ${php_extensions} | grep -w xdebug`" ] && pecl_xdebug=1
-      [ -n "`echo ${php_extensions} | grep -w modsecurity`" ] && pecl_modsecurity=1
       ;;
 
-
+    --modsecurity)
+      modsecurity_flag=y; shift 1
+      [ -e "${modsecurity_install_dir}/" ] && { echo "${CWARNING}modsecurity already installed! ${CEND}"; unset modsecurity_flag; }
+      ;;
+      
     --db_option)
       db_option=$2; shift 2
       if [[ "${db_option}" =~ ^[1-9]$|^1[0-3]$ ]]; then
@@ -378,7 +382,6 @@ if [ ${ARG_NUM} == 0 ]; then
       echo -e "\t${CMSG}14${CEND}. Install mongodb"
       echo -e "\t${CMSG}15${CEND}. Install swoole"
       echo -e "\t${CMSG}16${CEND}. Install xdebug(PHP>=5.5)"
-      echo -e "\t${CMSG}17${CEND}. Install modsecurity(nginx)"
 
       read -e -p "Please input numbers:(Default '4 11 12 14 17' press Enter) " phpext_option
       phpext_option=${phpext_option:-'4 11 12 14 17'}
@@ -410,7 +413,6 @@ if [ ${ARG_NUM} == 0 ]; then
         [ -n "`echo ${array_phpext[@]} | grep -w 14`" ] && pecl_mongodb=1
         [ -n "`echo ${array_phpext[@]} | grep -w 15`" ] && pecl_swoole=1
         [ -n "`echo ${array_phpext[@]} | grep -w 16`" ] && pecl_xdebug=1
-        [ -n "`echo ${array_phpext[@]} | grep -w 17`" ] && pecl_modsecurity=1
         break
       fi
     done
@@ -426,6 +428,18 @@ if [ ${ARG_NUM} == 0 ]; then
       break
     fi
   done
+  
+  # check modsecurity
+  while :; do echo
+    read -e -p "Do you want to install modsecurity [y/n]: " modsecurity_flag
+    if [[ ! ${modsecurity_flag} =~ ^[y,n]$ ]]; then
+      echo "${CWARNING}input error! Please only input 'y' or 'n'${CEND}"
+    else
+      [ "${modsecurity_flag}" == 'y' -a -e "${modsecurity_install_dir}" ] && { echo "${CWARNING}modsecurity already installed! ${CEND}"; unset modsecurity_flag; }
+      break
+    fi
+  done
+
 
   # check phpMyAdmin
   if [[ ${php_option} =~ ^[1-9]$ ]] || [ -e "${php_install_dir}/bin/phpize" ]; then
@@ -526,11 +540,8 @@ if [[ ${tomcat_option} =~ ^[1-4]$ ]] || [[ ${apache_option} =~ ^[1-2]$ ]] || [[ 
   . include/openssl.sh
   Install_openSSL | tee -a ${oneinstack_dir}/install.log
 fi
-# modsecurity
-if [ "${pecl_modsecurity}" == '1' ]; then
-    . include/modsecurity.sh
-    Install_modsecurity 2>&1 | tee -a ${oneinstack_dir}/install.log
-fi
+
+
 # Database
 case "${db_option}" in
   2)
