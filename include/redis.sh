@@ -1,7 +1,6 @@
 #!/bin/bash
 # Author:  yeho <lj2007331 AT gmail.com>
 
-
 Install_redis_server() {
   pushd ${oneinstack_dir}/src > /dev/null
   tar xzf redis-${redis_ver}.tar.gz
@@ -46,7 +45,7 @@ Install_redis_server() {
   else
     rm -rf ${redis_install_dir}
     echo "${CFAILURE}Redis-server install failed, Please contact the author! ${CEND}" && lsb_release -a
-    kill -9 $$
+    kill -9 $$; exit 1;
   fi
   popd > /dev/null
 }
@@ -55,12 +54,12 @@ Install_pecl_redis() {
   if [ -e "${php_install_dir}/bin/phpize" ]; then
     pushd ${oneinstack_dir}/src > /dev/null
     phpExtensionDir=`${php_install_dir}/bin/php-config --extension-dir`
-    if [ "$(${php_install_dir}/bin/php-config --version | awk -F. '{print $1}')" == '7' ]; then
-      tar xzf redis-${pecl_redis_ver}.tgz
-      pushd redis-${pecl_redis_ver} > /dev/null
-    else
+    if [ "$(${php_install_dir}/bin/php-config --version | awk -F. '{print $1}')" == '5' ]; then
       tar xzf redis-${pecl_redis_oldver}.tgz
       pushd redis-${pecl_redis_oldver} > /dev/null
+    else
+      tar xzf redis-${pecl_redis_ver}.tgz
+      pushd redis-${pecl_redis_ver} > /dev/null
     fi
     ${php_install_dir}/bin/phpize
     ./configure --with-php-config=${php_install_dir}/bin/php-config
