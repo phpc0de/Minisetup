@@ -30,7 +30,14 @@ checkDownload() {
       echo "Download openSSL1.1..."
       src_url=https://www.openssl.org/source/openssl-${openssl11_ver}.tar.gz && Download_src
   fi
-
+  
+  # modsecurity
+  if [ "${modsecurity_flag}" == 'y' ]; then
+    echo "Download modsecurity..."
+    src_url=https://github.com/SpiderLabs/ModSecurity/releases/download/v${modsecurity_ver}/modsecurity-${modsecurity_ver}.tar.gz && Download_src
+    src_url=https://github.com/SpiderLabs/ModSecurity-nginx/releases/download/v${modsecurity-nginx_ver}/modsecurity-nginx-v${modsecurity-nginx_ver}.tar.gz && Download_src
+  fi
+  
   # nginx
   case "${nginx_option}" in
     1)
@@ -244,12 +251,7 @@ checkDownload() {
     echo "Download ioncube..."
     src_url=https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_${SYS_BIT_d}.tar.gz && Download_src
   fi
-  # modsecurity
-  if [ "${pecl_modsecurity}" == '1' ]; then
-    echo "Download modsecurity..."
-    src_url=https://github.com/SpiderLabs/ModSecurity/releases/download/v${modsecurity_ver}/modsecurity-${modsecurity_ver}.tar.gz && Download_src
-    src_url=https://github.com/SpiderLabs/ModSecurity-nginx/releases/download/v${modsecurity-nginx_ver}/modsecurity-nginx-v${modsecurity-nginx_ver}.tar.gz && Download_src
-  fi
+
 
 
   # imageMagick
