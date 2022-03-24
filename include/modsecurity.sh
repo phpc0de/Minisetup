@@ -6,7 +6,7 @@ Install_modsecurity() {
     make clean all
     pushd ${oneinstack_dir}/src > /dev/null
     tar xzf modsecurity-${modsecurity_ver}.tar.gz
-    tar xzf modsecurity-${modsecurity-nginx_ver}.tar.gz
+    tar xzf modsecurity-nginx-v${modsecurity-nginx_ver}.tar.gz
     pushd modsecurity-${modsecurity_ver} > /dev/null
     sh autogen.sh
     ./configure --prefix=${modsecurity_install_dir} 
