@@ -11,10 +11,12 @@ Install_PHP73() {
   if [ ! -e "/usr/local/lib/libiconv.la" ]; then
     tar xzf libiconv-${libiconv_ver}.tar.gz
     pushd libiconv-${libiconv_ver} > /dev/null
-    ./configure 
+    ./configure --prefix=${libiconv_install_dir}
     make -j ${THREAD} && make install
     popd > /dev/null
     rm -rf libiconv-${libiconv_ver}
+    #ln -s ${libiconv_install_dir}/lib/ /usr/lib/
+    #ln -s ${libiconv_install_dir}/lib/ /usr/lib/
   fi
 
   if [ ! -e "${curl_install_dir}/lib/libcurl.la" ]; then
