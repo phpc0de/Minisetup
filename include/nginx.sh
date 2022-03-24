@@ -11,7 +11,7 @@ Install_Nginx() {
   tar xzf pcre-${pcre_ver}.tar.gz
   tar xzf nginx-${nginx_ver}.tar.gz
   tar xzf openssl-${openssl11_ver}.tar.gz
-  if [ -d "modsecurity-nginx-v${modsecurity_nginx_ver}" ]; then
+  if [ -d "modsecurity-nginx-v"${modsecurity_nginx_ver} ]; then
       ${nginx_modules_options}=${nginx_modules_options}" --add-dynamic-module=../modsecurity-nginx-v"${modsecurity_nginx_ver}
   pushd nginx-${nginx_ver} > /dev/null
 
