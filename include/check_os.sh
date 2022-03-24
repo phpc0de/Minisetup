@@ -9,13 +9,8 @@ if [ -e "/usr/bin/yum" ]; then
     [ -e /etc/yum.repos.d/epel.repo ] && rm -f /etc/yum.repos.d/epel.repo
   fi
   if ! command -v lsb_release >/dev/null 2>&1; then
-    if [ -e "/etc/euleros-release" ]; then
-      yum -y install euleros-lsb
-    elif [ -e "/etc/openEuler-release" -o -e "/etc/openeuler-release" ]; then
-      yum -y install openeuler-lsb
-    else
-      yum -y install redhat-lsb-core
-    fi
+
+    yum -y install redhat-lsb-core
     clear
   fi
 fi
@@ -26,7 +21,6 @@ if [ -e "/usr/bin/apt-get" ]; then
 fi
 
 command -v lsb_release >/dev/null 2>&1 || { echo "${CFAILURE}${PM} source failed! ${CEND}"; kill -9 $$; exit 1; }
-[ -e "/etc/anolis-release" ] && { command -v lsb_release >/dev/null 2>&1 || yum -y install system-lsb-core; }
 
 # Get OS Version
 OS=$(lsb_release -is)
@@ -34,27 +28,6 @@ if [[ "${OS}" =~ ^CentOS$|^CentOSStream$|^RedHat$|^Rocky$|^AlmaLinux$|^Fedora$|^
   LikeOS=RHEL
   RHEL_ver=$(lsb_release -rs | awk -F. '{print $1}' | awk '{print $1}')
   [[ "${OS}" =~ ^Fedora$ ]] && [ ${RHEL_ver} -ge 19 >/dev/null 2>&1 ] && { RHEL_ver=7; Fedora_ver=$(lsb_release -rs); }
-  [[ "${OS}" =~ ^Amazon$|^EulerOS$|^openEuler$ ]] && RHEL_ver=7
-  [[ "${OS}" =~ ^openEuler$ ]] && [[ "${RHEL_ver}" =~ ^21$ ]] && RHEL_ver=8
-  [[ "${OS}" =~ ^AlibabaCloud$|^AlibabaCloud\(AliyunLinux\)$ ]] && [[ "${RHEL_ver}" =~ ^2$ ]] && RHEL_ver=7
-  [[ "${OS}" =~ ^AlibabaCloud$|^AlibabaCloud\(AliyunLinux\)$ ]] && [[ "${RHEL_ver}" =~ ^3$ ]] && RHEL_ver=8
-elif [[ "${OS}" =~ ^Debian$|^Deepin$|^Uos$|^Kali$ ]]; then
-  LikeOS=Debian
-  Debian_ver=$(lsb_release -rs | awk -F. '{print $1}' | awk '{print $1}')
-  [[ "${OS}" =~ ^Deepin$|^Uos$ ]] && [[ "${Debian_ver}" =~ ^20$ ]] && Debian_ver=10
-  [[ "${OS}" =~ ^Kali$ ]] && [[ "${Debian_ver}" =~ ^202 ]] && Debian_ver=10
-elif [[ "${OS}" =~ ^Ubuntu$|^LinuxMint$|^elementary$ ]]; then
-  LikeOS=Ubuntu
-  Ubuntu_ver=$(lsb_release -rs | awk -F. '{print $1}' | awk '{print $1}')
-  if [[ "${OS}" =~ ^LinuxMint$ ]]; then
-    [[ "${Ubuntu_ver}" =~ ^18$ ]] && Ubuntu_ver=16
-    [[ "${Ubuntu_ver}" =~ ^19$ ]] && Ubuntu_ver=18
-    [[ "${Ubuntu_ver}" =~ ^20$ ]] && Ubuntu_ver=20
-  fi
-  if [[ "${OS}" =~ ^elementary$ ]]; then
-    [[ "${Ubuntu_ver}" =~ ^5$ ]] && Ubuntu_ver=18
-    [[ "${Ubuntu_ver}" =~ ^6$ ]] && Ubuntu_ver=20
-  fi
 fi
 
 # Check OS Version
@@ -107,7 +80,6 @@ fi
 
 THREAD=$(grep 'processor' /proc/cpuinfo | sort -u | wc -l)
 
-# Percona binary: https://www.percona.com/doc/percona-server/5.7/installation.html#installing-percona-server-from-a-binary-tarball
 if [ ${Debian_ver} -lt 9 >/dev/null 2>&1 ]; then
   sslLibVer=ssl100
 elif [[ "${RHEL_ver}" =~ ^[6-7]$ ]] && [ "${OS}" != 'Fedora' ]; then
