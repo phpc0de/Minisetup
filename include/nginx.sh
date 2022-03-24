@@ -14,6 +14,7 @@ Install_Nginx() {
   modnginx="modsecurity-nginx-v"${modsecurity_nginx_ver}
   if [ -d "${modnginx}" ]; then
       nginx_modules_options=${nginx_modules_options}" --add-dynamic-module=../"${modnginx}
+  fi
   pushd nginx-${nginx_ver} > /dev/null
 
   # close debug
