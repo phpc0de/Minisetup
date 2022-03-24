@@ -11,7 +11,7 @@ Install_Jemalloc() {
     make -j ${THREAD} && make install
     popd > /dev/null
     if [ -f "/usr/local/lib/libjemalloc.so" ]; then
-      if [ "${OS_BIT}" == '64' -a "${OS}" == 'CentOS' ]; then
+      if [ "${OS_BIT}" == '64' -a "${LikeOS}" == 'RHEL' ]; then
         ln -s /usr/local/lib/libjemalloc.so.2 /usr/lib64/libjemalloc.so.1
       else
         ln -s /usr/local/lib/libjemalloc.so.2 /usr/lib/libjemalloc.so.1
@@ -22,7 +22,7 @@ Install_Jemalloc() {
       rm -rf jemalloc-${jemalloc_ver}
     else
       echo "${CFAILURE}jemalloc install failed, Please contact the author! ${CEND}" && lsb_release -a
-      kill -9 $$
+      kill -9 $$; exit 1;
     fi
     popd > /dev/null
   fi
