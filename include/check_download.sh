@@ -35,7 +35,7 @@ checkDownload() {
   if [ "${modsecurity_flag}" == 'y' ]; then
     echo "Download modsecurity..."
     src_url=https://github.com/SpiderLabs/ModSecurity/releases/download/v${modsecurity_ver}/modsecurity-${modsecurity_ver}.tar.gz && Download_src
-    src_url=https://github.com/SpiderLabs/ModSecurity-nginx/releases/download/v${modsecurity-nginx_ver}/modsecurity-nginx-v${modsecurity-nginx_ver}.tar.gz && Download_src
+    src_url=https://github.com/SpiderLabs/ModSecurity-nginx/releases/download/v${modsecurity_nginx_ver}/modsecurity-nginx-v${modsecurity_nginx_ver}.tar.gz && Download_src
   fi
   
   # nginx
