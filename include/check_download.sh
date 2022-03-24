@@ -189,29 +189,29 @@ checkDownload() {
       src_url=https://secure.php.net/distributions/php-${php71_ver}.tar.gz && Download_src
   elif [ "${php_option}" == '7' ] || [ "${mphp_ver}" == '72' ]; then
       src_url=https://secure.php.net/distributions/php-${php72_ver}.tar.gz && Download_src
-      #src_url=https://github.com/P-H-C/phc-winner-argon2/archive/refs/tags/${argon2_ver}.tar.gz && Download_src
+      src_url=https://github.com/P-H-C/phc-winner-argon2/archive/refs/tags/${argon2_ver}.tar.gz && Download_src
       tar xzf argon2-${argon2_ver}.tar.gz
       src_url=https://github.com/jedisct1/libsodium/releases/download/${libsodium_ver}-RELEASE/libsodium-${libsodium_ver}.tar.gz && Download_src
   elif [ "${php_option}" == '8' ] || [ "${mphp_ver}" == '73' ]; then
       src_url=https://secure.php.net/distributions/php-${php73_ver}.tar.gz && Download_src
-      #src_url=https://github.com/P-H-C/phc-winner-argon2/archive/refs/tags/${argon2_ver}.tar.gz && Download_src
+      src_url=https://github.com/P-H-C/phc-winner-argon2/archive/refs/tags/${argon2_ver}.tar.gz && Download_src
       tar xzf argon2-${argon2_ver}.tar.gz
       src_url=https://github.com/jedisct1/libsodium/releases/download/${libsodium_ver}-RELEASE/libsodium-${libsodium_ver}.tar.gz && Download_src
   elif [ "${php_option}" == '9' ] || [ "${mphp_ver}" == '74' ]; then
       src_url=https://secure.php.net/distributions/php-${php74_ver}.tar.gz && Download_src
-      #src_url=https://github.com/P-H-C/phc-winner-argon2/archive/refs/tags/${argon2_ver}.tar.gz && Download_src
+      src_url=https://github.com/P-H-C/phc-winner-argon2/archive/refs/tags/${argon2_ver}.tar.gz && Download_src
       tar xzf argon2-${argon2_ver}.tar.gz
       src_url=https://github.com/jedisct1/libsodium/releases/download/${libsodium_ver}-RELEASE/libsodium-${libsodium_ver}.tar.gz && Download_src
       src_url=https://github.com/nih-at/libzip/releases/download/v${libzip_ver}/libzip-${libzip_ver}.tar.gz && Download_src
   elif [ "${php_option}" == '10' ] || [ "${mphp_ver}" == '80' ]; then
       src_url=https://secure.php.net/distributions/php-${php80_ver}.tar.gz && Download_src
-      #src_url=https://github.com/P-H-C/phc-winner-argon2/archive/refs/tags/${argon2_ver}.tar.gz && Download_src
+      src_url=https://github.com/P-H-C/phc-winner-argon2/archive/refs/tags/${argon2_ver}.tar.gz && Download_src
       tar xzf argon2-${argon2_ver}.tar.gz
       src_url=https://github.com/jedisct1/libsodium/releases/download/${libsodium_ver}-RELEASE/libsodium-${libsodium_ver}.tar.gz && Download_src
       src_url=https://github.com/nih-at/libzip/releases/download/v${libzip_ver}/libzip-${libzip_ver}.tar.gz && Download_src
   elif [ "${php_option}" == '11' ] || [ "${mphp_ver}" == '81' ]; then
       src_url=https://secure.php.net/distributions/php-${php81_ver}.tar.gz && Download_src
-      #src_url=https://github.com/P-H-C/phc-winner-argon2/archive/refs/tags/${argon2_ver}.tar.gz && Download_src
+      src_url=https://github.com/P-H-C/phc-winner-argon2/archive/refs/tags/${argon2_ver}.tar.gz && Download_src
       tar xzf argon2-${argon2_ver}.tar.gz
       src_url=https://github.com/jedisct1/libsodium/releases/download/${libsodium_ver}-RELEASE/libsodium-${libsodium_ver}.tar.gz && Download_src
       src_url=https://github.com/nih-at/libzip/releases/download/v${libzip_ver}/libzip-${libzip_ver}.tar.gz && Download_src
