@@ -45,24 +45,7 @@ Install_PHP72() {
     rm -rf freetype-${freetype_ver}
   fi
 
-  if [ ! -e "/usr/local/lib/pkgconfig/libargon2.pc" ]; then
-    tar xzf argon2-${argon2_ver}.tar.gz
-    pushd argon2-${argon2_ver} > /dev/null
-    make -j ${THREAD} && make install
-    [ ! -d /usr/local/lib/pkgconfig ] && mkdir -p /usr/local/lib/pkgconfig
-    /bin/cp libargon2.pc /usr/local/lib/pkgconfig/
-    popd > /dev/null
-    rm -rf argon2-${argon2_ver}
-  fi
 
-  if [ ! -e "/usr/local/lib/libsodium.la" ]; then
-    tar xzf libsodium-${libsodium_ver}.tar.gz
-    pushd libsodium-${libsodium_ver} > /dev/null
-    ./configure --disable-dependency-tracking --enable-minimal
-    make -j ${THREAD} && make install
-    popd > /dev/null
-    rm -rf libsodium-${libsodium_ver}
-  fi
 
   if [ ! -e "/usr/local/include/mhash.h" -a ! -e "/usr/include/mhash.h" ]; then
     tar xzf mhash-${mhash_ver}.tar.gz
@@ -103,7 +86,7 @@ Install_PHP72() {
     --with-iconv-dir=/usr/local --with-freetype-dir=${freetype_install_dir} --with-jpeg-dir --with-png-dir --with-zlib \
     --with-libxml-dir=/usr --enable-xml --disable-rpath --enable-bcmath --enable-shmop --enable-exif \
     --enable-sysvsem --enable-inline-optimization --with-curl=${curl_install_dir} --enable-mbregex \
-    --enable-mbstring --with-password-argon2 --with-sodium=/usr/local --with-gd --with-openssl=${openssl_install_dir} \
+    --enable-mbstring --with-gd --with-openssl=${openssl_install_dir} \
     --with-mhash --enable-pcntl --enable-sockets --with-xmlrpc --enable-ftp --enable-intl --with-xsl \
     --with-gettext --enable-zip --enable-soap --disable-debug ${php_modules_options}
   else
@@ -114,7 +97,7 @@ Install_PHP72() {
     --with-iconv-dir=/usr/local --with-freetype-dir=${freetype_install_dir} --with-jpeg-dir --with-png-dir --with-zlib \
     --with-libxml-dir=/usr --enable-xml --disable-rpath --enable-bcmath --enable-shmop --enable-exif \
     --enable-sysvsem --enable-inline-optimization --with-curl=${curl_install_dir} --enable-mbregex \
-    --enable-mbstring --with-password-argon2 --with-sodium=/usr/local --with-gd --with-openssl=${openssl_install_dir} \
+    --enable-mbstring --with-gd --with-openssl=${openssl_install_dir} \
     --with-mhash --enable-pcntl --enable-sockets --with-xmlrpc --enable-ftp --enable-intl --with-xsl \
     --with-gettext --enable-zip --enable-soap --disable-debug ${php_modules_options}
   fi
