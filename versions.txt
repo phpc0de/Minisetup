@@ -140,3 +140,6 @@ luajit2_ver=2.1-20220111
 lua_resty_core_ver=0.1.22
 lua_resty_lrucache_ver=0.11
 lua_cjson_ver=2.1.0.8
+
+modsecurity_ver=2.9.5
+modsecurity-nginx_ver=1.0.2
