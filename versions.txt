@@ -13,7 +13,7 @@ tomcat6_ver=6.0.53
 
 apache24_ver=2.4.46
 apache22_ver=2.2.34
-pcre_ver=8.44
+pcre_ver=8.45
 apr_ver=1.7.0
 apr_util_ver=1.6.1
 nghttp2_ver=1.42.0
