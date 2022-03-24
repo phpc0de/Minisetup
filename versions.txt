@@ -66,8 +66,8 @@ libmcrypt_ver=2.5.8
 mcrypt_ver=2.6.8
 mhash_ver=0.9.9.9
 freetype_ver=2.10.1
-icu4c_ver=68
-icu4c_ver2=2
+icu4c_ver=70
+icu4c_ver2=1
 
 libsodium_ver=1.0.18
 libzip_ver=1.7.3
