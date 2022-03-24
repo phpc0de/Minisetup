@@ -45,24 +45,6 @@ Install_PHP74() {
     rm -rf freetype-${freetype_ver}
   fi
 
-  if [ ! -e "/usr/local/lib/pkgconfig/libargon2.pc" ]; then
-    tar xzf argon2-${argon2_ver}.tar.gz
-    pushd argon2-${argon2_ver} > /dev/null
-    make -j ${THREAD} && make install
-    [ ! -d /usr/local/lib/pkgconfig ] && mkdir -p /usr/local/lib/pkgconfig
-    /bin/cp libargon2.pc /usr/local/lib/pkgconfig/
-    popd > /dev/null
-    rm -rf argon2-${argon2_ver}
-  fi
-
-  if [ ! -e "/usr/local/lib/libsodium.la" ]; then
-    tar xzf libsodium-${libsodium_ver}.tar.gz
-    pushd libsodium-${libsodium_ver} > /dev/null
-    ./configure --disable-dependency-tracking --enable-minimal
-    make -j ${THREAD} && make install
-    popd > /dev/null
-    rm -rf libsodium-${libsodium_ver}
-  fi
 
   if [ ! -e "/usr/local/lib/libzip.la" ]; then
     tar xzf libzip-${libzip_ver}.tar.gz
@@ -113,7 +95,7 @@ Install_PHP74() {
     --with-iconv-dir=/usr/local --with-freetype --with-jpeg --with-zlib \
     --enable-xml --disable-rpath --enable-bcmath --enable-shmop --enable-exif \
     --enable-sysvsem --enable-inline-optimization --with-curl=${curl_install_dir} --enable-mbregex \
-    --enable-mbstring --with-password-argon2 --with-sodium=/usr/local --enable-gd --with-openssl=${openssl_install_dir} \
+    --enable-mbstring --enable-gd --with-openssl=${openssl_install_dir} \
     --with-mhash --enable-pcntl --enable-sockets --with-xmlrpc --enable-ftp --enable-intl --with-xsl \
     --with-gettext --with-zip=/usr/local --enable-soap --disable-debug ${php_modules_options}
   else
@@ -124,7 +106,7 @@ Install_PHP74() {
     --with-iconv-dir=/usr/local --with-freetype --with-jpeg --with-zlib \
     --enable-xml --disable-rpath --enable-bcmath --enable-shmop --enable-exif \
     --enable-sysvsem --enable-inline-optimization --with-curl=${curl_install_dir} --enable-mbregex \
-    --enable-mbstring --with-password-argon2 --with-sodium=/usr/local --enable-gd --with-openssl=${openssl_install_dir} \
+    --enable-mbstring --enable-gd --with-openssl=${openssl_install_dir} \
     --with-mhash --enable-pcntl --enable-sockets --with-xmlrpc --enable-ftp --enable-intl --with-xsl \
     --with-gettext --with-zip=/usr/local --enable-soap --disable-debug ${php_modules_options}
   fi
