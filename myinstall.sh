@@ -541,7 +541,11 @@ if [[ ${tomcat_option} =~ ^[1-4]$ ]] || [[ ${apache_option} =~ ^[1-2]$ ]] || [[ 
   Install_openSSL | tee -a ${oneinstack_dir}/install.log
 fi
 
-
+# modsecurity
+if [ "${modsecurity_flag}" == 'y' ]; then
+  . include/modsecurity.sh
+  Install_modsecurity 2>&1 | tee -a ${oneinstack_dir}/install.log
+fi
 # Database
 case "${db_option}" in
   2)
