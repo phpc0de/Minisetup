@@ -526,7 +526,11 @@ if [[ ${tomcat_option} =~ ^[1-4]$ ]] || [[ ${apache_option} =~ ^[1-2]$ ]] || [[ 
   . include/openssl.sh
   Install_openSSL | tee -a ${oneinstack_dir}/install.log
 fi
-
+# modsecurity
+if [ "${pecl_modsecurity}" == '1' ]; then
+    . include/modsecurity.sh
+    Install_modsecurity 2>&1 | tee -a ${oneinstack_dir}/install.log
+fi
 # Database
 case "${db_option}" in
   2)
@@ -705,11 +709,7 @@ PHP_addons() {
     . include/pecl_xdebug.sh
     Install_pecl_xdebug 2>&1 | tee -a ${oneinstack_dir}/install.log
   fi
-  # modsecurity
-  if [ "${pecl_modsecurity}" == '1' ]; then
-    . include/modsecurity.sh
-    Install_modsecurity 2>&1 | tee -a ${oneinstack_dir}/install.log
-  fi
+
   # pecl_pgsql
   if [ -e "${pgsql_install_dir}/bin/psql" ]; then
     . include/pecl_pgsql.sh
