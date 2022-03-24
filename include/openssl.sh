@@ -19,6 +19,8 @@ Install_openSSL() {
       echo "${CSUCCESS}openSSL installed successfully! ${CEND}"
       /bin/cp cacert.pem ${openssl_install_dir}/cert.pem
       rm -rf openssl-${openssl_ver}
+      ln -s ${openssl_install_dir}/lib/libssl.so.1.1 /usr/lib/libssl.so.1.1
+      ln -s ${openssl_install_dir}/lib/libcrypto.so.1.1 /usr/lib/libcrypto.so.1.1
     else
       echo "${CFAILURE}openSSL install failed, Please contact the author! ${CEND}" && lsb_release -a
       kill -9 $$; exit 1;
