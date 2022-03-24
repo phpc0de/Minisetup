@@ -61,16 +61,18 @@ checkDownload() {
     case "${db_option}" in
       2)
         # MySQL 5.7
-        DOWN_ADDR_MYSQL=https://cdn.mysql.com/Downloads/MySQL-5.7
-        DOWN_ADDR_MYSQL_BK=https://mysql.he.net/Downloads/MySQL-5.7
 
 
         if [ "${dbinstallmethod}" == '1' ]; then
           echo "Download MySQL 5.7 binary package..."
           FILE_NAME=mysql-${mysql57_ver}-linux-glibc2.12-${SYS_BIT_b}.tar.gz
+          DOWN_ADDR_MYSQL=https://cdn.mysql.com/Downloads/MySQL-5.7
+          DOWN_ADDR_MYSQL_BK=https://cdn.mysql.com/Downloads/MySQL-5.7
         elif [ "${dbinstallmethod}" == '2' ]; then
           echo "Download MySQL 5.7 source package..."
           FILE_NAME=mysql-${mysql57_ver}.tar.gz
+          DOWN_ADDR_MYSQL=https://cdn.mysql.com/Downloads/MySQL-5.7
+          DOWN_ADDR_MYSQL_BK=https://github.com/mysql/mysql-server/archive/refs/tags/
         fi
         # start download
         src_url=${DOWN_ADDR_MYSQL}/${FILE_NAME} && Download_src
@@ -82,9 +84,9 @@ checkDownload() {
         while [ "$(md5sum ${FILE_NAME} | awk '{print $1}')" != "${MYSQL_TAR_MD5}" ]; do
           echo "$(md5sum ${FILE_NAME} | awk '{print $1}')" >> errorMD5.txt
           tryDlCount="6"
-          #wget -c ${DOWN_ADDR_MYSQL_BK}/${FILE_NAME};sleep 1
-          #let "tryDlCount++"
-          #[ "$(md5sum ${FILE_NAME} | awk '{print $1}')" == "${MYSQL_TAR_MD5}" -o "${tryDlCount}" == '6' ] && break || continue
+          wget -c ${DOWN_ADDR_MYSQL_BK}/${FILE_NAME};sleep 1
+          let "tryDlCount++"
+          [ "$(md5sum ${FILE_NAME} | awk '{print $1}')" == "${MYSQL_TAR_MD5}" -o "${tryDlCount}" == '6' ] && break || continue
         done
         if [ "${tryDlCount}" == '6' ]; then
           echo "${CFAILURE}${FILE_NAME} download failed, Please contact the author! ${CEND}"
@@ -93,16 +95,19 @@ checkDownload() {
         ;;
       3)
         # MySQL 5.6
-        DOWN_ADDR_MYSQL=https://cdn.mysql.com/Downloads/MySQL-5.6
-        DOWN_ADDR_MYSQL_BK=https://mysql.he.net/Downloads/MySQL-5.6
+
 
 
         if [ "${dbinstallmethod}" == '1' ]; then
           echo "Download MySQL 5.6 binary package..."
           FILE_NAME=mysql-${mysql56_ver}-linux-glibc2.12-${SYS_BIT_b}.tar.gz
+          DOWN_ADDR_MYSQL=https://cdn.mysql.com/Downloads/MySQL-5.6
+          DOWN_ADDR_MYSQL_BK=https://cdn.mysql.com/Downloads/MySQL-5.6
         elif [ "${dbinstallmethod}" == '2' ]; then
           echo "Download MySQL 5.6 source package..."
           FILE_NAME=mysql-${mysql56_ver}.tar.gz
+          DOWN_ADDR_MYSQL=https://cdn.mysql.com/Downloads/MySQL-5.6
+          DOWN_ADDR_MYSQL_BK=https://github.com/mysql/mysql-server/archive/refs/tags/
         fi
         # start download
         src_url=${DOWN_ADDR_MYSQL}/${FILE_NAME} && Download_src
@@ -114,17 +119,36 @@ checkDownload() {
         while [ "$(md5sum ${FILE_NAME} | awk '{print $1}')" != "${MYSQL_TAR_MD5}" ]; do
           echo "$(md5sum ${FILE_NAME} | awk '{print $1}')" >> errorMD5.txt
           tryDlCount="6"
-          #wget -c --no-check-certificate ${DOWN_ADDR_MYSQL_BK}/${FILE_NAME};sleep 1
-          #let "tryDlCount++"
-          #[ "$(md5sum ${FILE_NAME} | awk '{print $1}')" == "${MYSQL_TAR_MD5}" -o "${tryDlCount}" == '6' ] && break || continue
+          wget -c --no-check-certificate ${DOWN_ADDR_MYSQL_BK}/${FILE_NAME};sleep 1
+          let "tryDlCount++"
+          [ "$(md5sum ${FILE_NAME} | awk '{print $1}')" == "${MYSQL_TAR_MD5}" -o "${tryDlCount}" == '6' ] && break || continue
         done
         if [ "${tryDlCount}" == '6' ]; then
           echo "${CFAILURE}${FILE_NAME} download failed, Please contact the author! ${CEND}"
           kill -9 $$
         fi
         ;;
-
-      15)
+      13)
+        FILE_NAME=postgresql-${pgsql_ver}.tar.gz
+        DOWN_ADDR_PGSQL=https://ftp.postgresql.org/pub/source/v${pgsql_ver}
+        DOWN_ADDR_PGSQL_BK=https://ftp.postgresql.org/pub/source/v${pgsql_ver}
+        
+        src_url=${DOWN_ADDR_PGSQL}/${FILE_NAME} && Download_src
+        src_url=${DOWN_ADDR_PGSQL}/${FILE_NAME}.md5 && Download_src
+        PGSQL_TAR_MD5=$(awk '{print $1}' ${FILE_NAME}.md5)
+        [ -z "${PGSQL_TAR_MD5}" ] && PGSQL_TAR_MD5=$(curl -s ${DOWN_ADDR_PGSQL_BK}/${FILE_NAME}.md5 | grep ${FILE_NAME} | awk '{print $1}')
+        tryDlCount=0
+        while [ "$(md5sum ${FILE_NAME} | awk '{print $1}')" != "${PGSQL_TAR_MD5}" ]; do
+          wget -c --no-check-certificate ${DOWN_ADDR_PGSQL_BK}/${FILE_NAME};sleep 1
+          let "tryDlCount++"
+          [ "$(md5sum ${FILE_NAME} | awk '{print $1}')" == "${PGSQL_TAR_MD5}" -o "${tryDlCount}" == '6' ] && break || continue
+        done
+        if [ "${tryDlCount}" == '6' ]; then
+          echo "${CFAILURE}${FILE_NAME} download failed, Please contact the author! ${CEND}"
+          kill -9 $$; exit 1;
+        fi
+        ;;
+      14)
         # MongoDB
         echo "Download MongoDB binary package..."
         FILE_NAME=mongodb-linux-${SYS_BIT_b}-${mongodb_ver}.tgz
@@ -149,7 +173,7 @@ checkDownload() {
   fi
 
   # PHP
-  if [[ "${php_option}" =~ ^[1-9]$ ]]; then
+  if [[ "${php_option}" =~ ^[1-9]$|^1[0-1]$ ]] || [[ "${mphp_ver}" =~ ^5[3-6]$|^7[0-4]$|^8[0-1]$ ]]; then
     echo "PHP common..."
     src_url=https://ftp.gnu.org/pub/gnu/libiconv/libiconv-${libiconv_ver}.tar.gz && Download_src
     src_url=https://curl.haxx.se/download/curl-${curl_ver}.tar.gz && Download_src
@@ -159,33 +183,46 @@ checkDownload() {
     src_url=https://download.savannah.gnu.org/releases/freetype/freetype-${freetype_ver}.tar.gz && Download_src
   fi
 
-  case "${php_option}" in
-    5)
+  if [ "${php_option}" == '5' ] || [ "${mphp_ver}" == '70' ]; then
       src_url=https://secure.php.net/distributions/php-${php70_ver}.tar.gz && Download_src
       ;;
-    6)
+  elif [ "${php_option}" == '6' ] || [ "${mphp_ver}" == '71' ]; then
       src_url=https://secure.php.net/distributions/php-${php71_ver}.tar.gz && Download_src
       ;;
-    7)
+  elif [ "${php_option}" == '7' ] || [ "${mphp_ver}" == '72' ]; then
       src_url=https://secure.php.net/distributions/php-${php72_ver}.tar.gz && Download_src
       #src_url=https://github.com/P-H-C/phc-winner-argon2/archive/${argon2_ver}.tar.gz && Download_src
       tar xzf argon2-${argon2_ver}.tar.gz
       src_url=https://github.com/jedisct1/libsodium/releases/download/${libsodium_ver}-RELEASE/libsodium-${libsodium_ver}.tar.gz && Download_src
       ;;
-    8)
+  elif [ "${php_option}" == '8' ] || [ "${mphp_ver}" == '73' ]; then
       src_url=https://secure.php.net/distributions/php-${php73_ver}.tar.gz && Download_src
       #src_url=https://github.com/P-H-C/phc-winner-argon2/archive/${argon2_ver}.tar.gz && Download_src
       tar xzf argon2-${argon2_ver}.tar.gz
       src_url=https://github.com/jedisct1/libsodium/releases/download/${libsodium_ver}-RELEASE/libsodium-${libsodium_ver}.tar.gz && Download_src
       ;;
-    9)
+  elif [ "${php_option}" == '9' ] || [ "${mphp_ver}" == '74' ]; then
       src_url=https://secure.php.net/distributions/php-${php74_ver}.tar.gz && Download_src
       #src_url=https://github.com/P-H-C/phc-winner-argon2/archive/${argon2_ver}.tar.gz && Download_src
       tar xzf argon2-${argon2_ver}.tar.gz
       src_url=https://github.com/jedisct1/libsodium/releases/download/${libsodium_ver}-RELEASE/libsodium-${libsodium_ver}.tar.gz && Download_src
       src_url=https://github.com/nih-at/libzip/releases/download/v${libzip_ver}/libzip-${libzip_ver}.tar.gz && Download_src
       ;;
-  esac
+  elif [ "${php_option}" == '10' ] || [ "${mphp_ver}" == '80' ]; then
+      src_url=https://secure.php.net/distributions/php-${php80_ver}.tar.gz && Download_src
+      #src_url=https://github.com/P-H-C/phc-winner-argon2/archive/${argon2_ver}.tar.gz && Download_src
+      tar xzf argon2-${argon2_ver}.tar.gz
+      src_url=https://github.com/jedisct1/libsodium/releases/download/${libsodium_ver}-RELEASE/libsodium-${libsodium_ver}.tar.gz && Download_src
+      src_url=https://github.com/nih-at/libzip/releases/download/v${libzip_ver}/libzip-${libzip_ver}.tar.gz && Download_src
+      ;;
+  elif [ "${php_option}" == '11' ] || [ "${mphp_ver}" == '81' ]; then
+      src_url=https://secure.php.net/distributions/php-${php81_ver}.tar.gz && Download_src
+      #src_url=https://github.com/P-H-C/phc-winner-argon2/archive/${argon2_ver}.tar.gz && Download_src
+      tar xzf argon2-${argon2_ver}.tar.gz
+      src_url=https://github.com/jedisct1/libsodium/releases/download/${libsodium_ver}-RELEASE/libsodium-${libsodium_ver}.tar.gz && Download_src
+      src_url=https://github.com/nih-at/libzip/releases/download/v${libzip_ver}/libzip-${libzip_ver}.tar.gz && Download_src
+      ;;
+  fi
 
   # PHP OPCache
   case "${phpcache_option}" in
@@ -328,15 +365,7 @@ checkDownload() {
       src_url=https://files.phpmyadmin.net/phpMyAdmin/${phpmyadmin_ver}/phpMyAdmin-${phpmyadmin_ver}-all-languages.tar.gz && Download_src
     fi
   fi
-
-  # others
-  if [ "${downloadDepsSrc}" == '1' ]; then
-    if [ "${PM}" == 'yum' ]; then
-      echo "Download htop for CentOS..."
-      src_url=https://github.com/htop-dev/htop/archive/${htop_ver}.tar.gz && Download_src
-    fi
-
-
+  
 
 
   fi
