@@ -5,7 +5,7 @@ Install_ImageMagick() {
     echo "${CWARNING}ImageMagick already installed! ${CEND}"
   else
     pushd ${oneinstack_dir}/src > /dev/null
-    tar xzf ImageMagick-${imagemagick_ver}.tar.gz
+    tar xzf ${imagemagick_ver}.tar.gz
     #if [ "${PM}" == 'yum' ]; then
     #  yum -y install libwebp-devel
     #else if [ "${PM}" == 'apt-get' ]; then
