@@ -45,7 +45,7 @@ Show_Help() {
   --phpcache_option [1-4]     Install PHP opcode cache, default: 1 opcache
   --php_extensions [ext name] Install PHP extensions, include zendguardloader,ioncube,
                               sourceguardian,imagick,gmagick,fileinfo,imap,ldap,calendar,phalcon,
-                              yaf,yar,redis,memcached,memcache,mongodb,swoole,xdebug
+                              yaf,yar,redis,memcached,memcache,mongodb,swoole,xdebug,modsecurity
 
 
   --db_option [1-14]          Install DB version
@@ -113,6 +113,7 @@ while :; do
       [ -n "`echo ${php_extensions} | grep -w mongodb`" ] && pecl_mongodb=1
       [ -n "`echo ${php_extensions} | grep -w swoole`" ] && pecl_swoole=1
       [ -n "`echo ${php_extensions} | grep -w xdebug`" ] && pecl_xdebug=1
+      [ -n "`echo ${php_extensions} | grep -w modsecurity`" ] && pecl_modsecurity=1
       ;;
 
 
@@ -377,11 +378,13 @@ if [ ${ARG_NUM} == 0 ]; then
       echo -e "\t${CMSG}14${CEND}. Install mongodb"
       echo -e "\t${CMSG}15${CEND}. Install swoole"
       echo -e "\t${CMSG}16${CEND}. Install xdebug(PHP>=5.5)"
-      read -e -p "Please input numbers:(Default '4 11 12 14' press Enter) " phpext_option
-      phpext_option=${phpext_option:-'4 11 12 14'}
+      echo -e "\t${CMSG}17${CEND}. Install modsecurity(nginx)"
+
+      read -e -p "Please input numbers:(Default '4 11 12 14 17' press Enter) " phpext_option
+      phpext_option=${phpext_option:-'4 11 12 14 17'}
       [ "${phpext_option}" == '0' ] && break
       array_phpext=(${phpext_option})
-      array_all=(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16)
+      array_all=(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17)
       for v in ${array_phpext[@]}
       do
         [ -z "`echo ${array_all[@]} | grep -w ${v}`" ] && phpext_flag=1
@@ -407,6 +410,7 @@ if [ ${ARG_NUM} == 0 ]; then
         [ -n "`echo ${array_phpext[@]} | grep -w 14`" ] && pecl_mongodb=1
         [ -n "`echo ${array_phpext[@]} | grep -w 15`" ] && pecl_swoole=1
         [ -n "`echo ${array_phpext[@]} | grep -w 16`" ] && pecl_xdebug=1
+        [ -n "`echo ${array_phpext[@]} | grep -w 17`" ] && pecl_modsecurity=1
         break
       fi
     done
@@ -700,6 +704,11 @@ PHP_addons() {
   if [ "${pecl_xdebug}" == '1' ]; then
     . include/pecl_xdebug.sh
     Install_pecl_xdebug 2>&1 | tee -a ${oneinstack_dir}/install.log
+  fi
+  # modsecurity
+  if [ "${pecl_modsecurity}" == '1' ]; then
+    . include/modsecurity.sh
+    Install_modsecurity 2>&1 | tee -a ${oneinstack_dir}/install.log
   fi
   # pecl_pgsql
   if [ -e "${pgsql_install_dir}/bin/psql" ]; then
