@@ -248,6 +248,7 @@ checkDownload() {
   if [ "${pecl_modsecurity}" == '1' ]; then
     echo "Download modsecurity..."
     src_url=https://github.com/SpiderLabs/ModSecurity/releases/download/v${modsecurity_ver}/modsecurity-${modsecurity_ver}.tar.gz && Download_src
+    src_url=https://github.com/SpiderLabs/ModSecurity-nginx/releases/download/v${modsecurity-nginx_ver}/modsecurity-nginx-v${modsecurity-nginx_ver}.tar.gz && Download_src
   fi
 
 
