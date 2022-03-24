@@ -359,9 +359,7 @@ checkDownload() {
     fi
   fi
   
-
-
-  fi
+  
 
   popd > /dev/null
 }
