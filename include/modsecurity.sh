@@ -7,7 +7,7 @@ Install_modsecurity() {
     pushd ${oneinstack_dir}/src > /dev/null
     #tar xzf "modsecurity-"${modsecurity_ver}.tar.gz
     #tar xzf "modsecurity-nginx-v"${modsecurity_nginx_ver}.tar.gz
-    pushd "modsecurity-"${modsecurity_ver} > /dev/null
+    pushd "ModSecurity" > /dev/null
     git submodule init
     git submodule update
     sh ./build.sh
