@@ -26,8 +26,8 @@ Install_Nginx() {
   if [ -d  "${modnginx}" ]; then
 
       make modules
-      mkdir -p ${nginx_install}/modules 
-      cp objs/ngx_http_modsecurity_module.so ${nginx_install}/modules 
+      mkdir -p ${nginx_install_dir}/modules 
+      cp objs/ngx_http_modsecurity_module.so ${nginx_install_dir}/modules 
   fi
   make -j ${THREAD} && make install
   if [ -e "${nginx_install_dir}/conf/nginx.conf" ]; then
