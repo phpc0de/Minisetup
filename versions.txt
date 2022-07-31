@@ -1,10 +1,10 @@
 # newest software version
 # Web
-nginx_ver=1.21.6
+nginx_ver=1.23.1
 tengine_ver=2.3.2
 openresty_ver=1.19.3.1
-openssl11_ver=1.1.1n
-openssl_ver=1.1.1n
+openssl11_ver=1.1.1q
+openssl_ver=1.1.1q
 
 tomcat9_ver=9.0.39
 tomcat8_ver=8.5.59
@@ -20,7 +20,7 @@ nghttp2_ver=1.42.0
 
 # DB
 mysql80_ver=8.0.28
-mysql57_ver=5.7.37
+mysql57_ver=5.7.38
 mysql56_ver=5.6.51
 mysql55_ver=5.5.62
 
@@ -36,7 +36,7 @@ percona55_ver=5.5.62-38.14
 
 alisql_ver=5.6.32-9
 
-pgsql_ver=12.5
+pgsql_ver=12.11
 
 mongodb_ver=4.0.21
 
@@ -96,7 +96,7 @@ xdebug_oldver=2.9.8
 pureftpd_ver=1.0.50
 
 # Redis
-redis_ver=6.2.6
+redis_ver=6.2.7
 redis_oldver=5.0.14
 pecl_redis_ver=5.3.7
 pecl_redis_oldver=4.3.0
