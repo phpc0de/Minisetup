@@ -39,7 +39,7 @@ fi
 command -v gcc > /dev/null 2>&1 || $PM -y install gcc
 gcc_ver=$(gcc -dumpversion | awk -F. '{print $1}')
 
-[ ${gcc_ver} -lt 5 >/dev/null 2>&1 ] && sudo yum install -y devtoolset-9-gcc devtoolset-9-gcc-c++ &&  source scl_source enable devtoolset-9 && scl enable devtoolset-9 -- bash
+[ ${gcc_ver} -lt 5 >/dev/null 2>&1 ] && sudo yum install -y devtoolset-11-gcc devtoolset-11-gcc-c++ &&  source scl_source enable devtoolset-11 && scl enable devtoolset-11 -- bash
 
 if uname -m | grep -Eqi "arm|aarch64"; then
   armplatform="y"
