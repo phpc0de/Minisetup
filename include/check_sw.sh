@@ -25,9 +25,6 @@ installDepsRHEL() {
     systemctl enable chronyd
     systemctl stop firewalld && systemctl mask firewalld.service
   elif [ "${RHEL_ver}" == '7' ]; then
-    sudo yum install centos-release-scl
-    sudo yum install devtoolset-9-gcc*
-    scl enable devtoolset-9 bash
     yum -y install epel-release
     yum -y groupremove "Basic Web Server" "MySQL Database server" "MySQL Database client"
     systemctl stop firewalld && systemctl mask firewalld.service
