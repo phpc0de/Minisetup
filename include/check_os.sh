@@ -39,7 +39,6 @@ fi
 command -v gcc > /dev/null 2>&1 || $PM -y install gcc
 gcc_ver=$(gcc -dumpversion | awk -F. '{print $1}')
 
-[ ${gcc_ver} -lt 5 >/dev/null 2>&1 ] && yum install centos-release-scl-rh && yum install -y devtoolset-9-gcc-c++ && scl enable devtoolset-9 -- bash
 
 if uname -m | grep -Eqi "arm|aarch64"; then
   armplatform="y"
